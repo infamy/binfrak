@@ -1,6 +1,6 @@
 from twisted.web import http
-import binfrak.Proxy
+from binfrak.Proxy import Proxy
 
 class ProxyFactory(http.HTTPFactory):
     '''ProxyFactory class stub'''
-    protocol = binfrak.Proxy
+    protocol = Proxy

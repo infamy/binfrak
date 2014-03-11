@@ -1,6 +1,6 @@
 from twisted.web import proxy
-import binfrak.ProxyClient
+from binfrak.ProxyClient import ProxyClient
 
 class ProxyClientFactory(proxy.ProxyClientFactory):
     '''ProxyClientFactory class stub'''
-    protocol = binfrak.ProxyClient
+    protocol = ProxyClient
