@@ -3,6 +3,8 @@ from twisted.web import http, proxy
 import gzip, StringIO
 
 class ProxyClient(proxy.ProxyClient):
+    '''Where all the magic happens. This class is where we intercept the data.
+    '''
 
     def __init__(self, command, uri, postData, headers, client):
         self.isCompressed = False
