@@ -1,10 +1,9 @@
 from twisted.python import log
 from twisted.web import http, proxy
+import gzip, StringIO
 
 class ProxyClient(proxy.ProxyClient):
-    """Mange returned header, content here.
-	Use `self.father` methods to modify request directly.
-    """
+
     def handleHeader(self, key, value):
         # change response header here
         log.msg("Header: %s: %s" % (key, value))
@@ -12,10 +11,10 @@ class ProxyClient(proxy.ProxyClient):
 	
     def handleResponse(self, data):
         if (self.isCompressed):
-            logging.debug("Decompressing content...")
+            log.msg("Decompressing content...")
             data = gzip.GzipFile('', 'rb', 9, StringIO.StringIO(data)).read()
             
-        log.msg( "Read from server:\n" + data)
+        #log.msg( "Read from server:\n" + data)
 
         if (self.contentLength != None):
             self.client.setHeader('Content-Length', len(data))
@@ -39,7 +38,7 @@ listenport = 10000
 
 if __name__ == '__main__':
     import sys
-    from twisted.internet import endpoints, reactor
+    from twisted.internet import reactor
 
     def shutdown(reason, reactor, stopping=[]):
         """Stop the reactor."""
