@@ -1,7 +1,7 @@
 binfrak
 =======
 
-**THIS TOOL IS FOR USE BY SECURITY PROFESSIONAL**
+**THIS TOOL IS FOR USE BY SECURITY PROFESSIONALS**
 
 Fudging proxy, to allow manipulation of binary, js, html, or any other type of data that is tranfered over http. Manipulation of the data is done via a plugin architecture. This allows manipulation of multiple file formats for many us.
 

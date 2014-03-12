@@ -4,8 +4,6 @@ from twisted.python import log
 from binfrak.ProxyFactory import ProxyFactory
 from twisted.internet import reactor
 
-
-
 def shutdown(reason, reactor, stopping=[]):
     """Stop the reactor."""
     if stopping:
