@@ -18,3 +18,4 @@ class Plugin:
         #frak the data
         data += "THIS IS A TEST APPEND"
         return data
+

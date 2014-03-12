@@ -1,6 +1,6 @@
 from twisted.python import log
 from twisted.web import http, proxy
-import gzip, StringIO
+import gzip, StringIO, binfrak
 
 class ProxyClient(proxy.ProxyClient):
     """Where all the magic happens. This class is where we intercept the data."""
@@ -18,7 +18,7 @@ class ProxyClient(proxy.ProxyClient):
     def handleHeader(self, key, value):
         # change response header here
         log.msg("Header: %s: %s" % (key, value))
-
+        plugins = binfrak.loadPlugins()
         if key.lower() == 'content-encoding':
             if value.find('gzip') != -1:
                 logging.debug("Response is compressed...")
@@ -31,7 +31,7 @@ class ProxyClient(proxy.ProxyClient):
             for plugin in plugins.values():
                 if plugin.isFrakable(key, value):
                     self.plugin = plugin
-                    log.msg("Using:" + plugin)
+                    log.msg("Using:", plugin)
 
         proxy.ProxyClient.handleHeader(self, key, value)
 
