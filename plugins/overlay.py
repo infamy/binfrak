@@ -1,8 +1,9 @@
 from twisted.python import log
+import tempfile, subprocess, os
 
 class Plugin:
     def __init__(self):
-        log.msg("Loading plugin - test")
+        log.msg("Loading plugin - overlay")
         self.applicationHeaders = ['application/octet-stream','application/x-msdos-program']
 
     def isFrakable(self, key, value):
@@ -15,7 +16,12 @@ class Plugin:
         return False
 
     def frak(self, data):
+	log.msg("Overlay!")
         #frak the data
-        #data += "THIS IS A TEST APPEND"
+	bfp = tempfile.NamedTemporaryFile()
+        bfp.write(data)
+        bfp.flush()
+        	
+        bfp.close()
         return data
 
