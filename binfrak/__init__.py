@@ -10,4 +10,6 @@ def loadPlugins():
             mod = __import__(fname)
             plugins[fname] = mod.Plugin()
     sys.path.pop(0)
+    #disable plugins
+    #plugins = {}
     return plugins

