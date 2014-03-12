@@ -3,12 +3,17 @@ from twisted.web import http, proxy
 import gzip, StringIO
 
 class ProxyClient(proxy.ProxyClient):
-    '''Where all the magic happens. This class is where we intercept the data.'''
+    """Where all the magic happens. This class is where we intercept the data."""
 
-    def __init__(self, command, uri, postData, headers, client):
+    def __init__(self, command, rest, version, headers, data, father):
+        self.father = father
+        self.command = command
+        self.rest = rest
+        self.headers = headers
+        self.data = data
         self.isCompressed = False
         self.contentLength = None
-	self.plugin = None
+        self.plugin = None
 
     def handleHeader(self, key, value):
         # change response header here
@@ -21,13 +26,12 @@ class ProxyClient(proxy.ProxyClient):
 
         if key.lower() == 'content-length':
             self.contentLength = value
-	
+	    log.msg(key, value)
         if self.plugin == None:
             for plugin in plugins.values():
                 if plugin.isFrakable(key, value):
                     self.plugin = plugin
                     log.msg("Using:" + plugin)
-
 
         proxy.ProxyClient.handleHeader(self, key, value)
 
